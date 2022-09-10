@@ -10,7 +10,13 @@ import decoration from '../../resources/img/vision.png';
 class App extends Component {
 
   state = {
-    showRandomCharacter: true,
+    selectedCharId: null,
+  }
+
+  onCharSelected = (id) => {
+    this.setState({
+      selectedCharId: id
+    })
   }
 
   render() {
@@ -18,10 +24,10 @@ class App extends Component {
       <div className="app">
         <AppHeader/>
         <main>
-          {this.state.showRandomCharacter ? <RandomChar/> : null}
+          <RandomChar/>
           <div className="char__content">
-            <CharList/>
-            <CharInfo/>
+            <CharList onCharSelected={this.onCharSelected}/>
+            <CharInfo charId={this.state.selectedCharId}/>
           </div>
           <img className="bg-decoration" src={decoration} alt="vision"/>
         </main>

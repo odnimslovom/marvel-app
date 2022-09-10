@@ -20,11 +20,19 @@ class CharList extends Component {
     this.updateCharactersList();
   }
 
+
   updateCharactersList = () => {
+    this.onCharListLoading();
     this.marvelService
       .getAllCharacters()
       .then(this.onCharactersListLoaded)
       .catch(this.onCharactersListLoadingError)
+  }
+
+  onCharListLoading = () => {
+    this.setState({
+      isLoading : true
+    })
   }
 
   onCharactersListLoadingError = () => {
@@ -59,7 +67,8 @@ class CharList extends Component {
       const noImageSrc = 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg';
       const imgStyle = character.thumbnail === noImageSrc ? {objectFit: 'contain'} : {objectFit: 'cover'};
 
-      return <CharacterListItem key={character.name}
+      return <CharacterListItem key={character.id}
+                                onClick={() => this.props.onCharSelected(character.id)}
                                 name={character.name}
                                 src={character.thumbnail}
                                 style={imgStyle}
@@ -82,10 +91,10 @@ class CharList extends Component {
 
 }
 
-const CharacterListItem = ({name, src}) => {
+const CharacterListItem = ({name, src, style, onClick}) => {
   return (
-    <li className="char__item">
-      <img src={src} alt={name}/>
+    <li className="char__item" onClick={onClick}>
+      <img src={src} alt={name} style={style}/>
       <div className="char__name">{name}</div>
     </li>
   )
