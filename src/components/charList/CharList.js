@@ -20,7 +20,6 @@ class CharList extends Component {
     this.updateCharactersList();
   }
 
-
   updateCharactersList = () => {
     this.onCharListLoading();
     this.marvelService
@@ -31,7 +30,7 @@ class CharList extends Component {
 
   onCharListLoading = () => {
     this.setState({
-      isLoading : true
+      isLoading: true
     })
   }
 
@@ -57,11 +56,6 @@ class CharList extends Component {
   render() {
 
     const {characters, isLoading, hasError} = this.state;
-
-    const errorMessage = hasError ? <ErrorMessage/> : null;
-    const spinner = isLoading ? <Spinner/> : null;
-    //const content = !(isLoading || hasError) ? <View character={character}/> : null;
-
     const content = characters.map(character => {
 
       const noImageSrc = 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg';
@@ -74,13 +68,16 @@ class CharList extends Component {
                                 style={imgStyle}
       />
     })
+    const errorMessage = hasError ? <ErrorMessage/> : null;
+    const spinner = isLoading ? <Spinner/> : null;
+    const charList = !(isLoading || hasError) ? content : null;
 
     return (
       <div className="char__list">
         {spinner}
         {errorMessage}
         <ul className="char__grid">
-          {content}
+          {charList}
         </ul>
         <button className="button button__main button__long">
           <div className="inner">load more</div>

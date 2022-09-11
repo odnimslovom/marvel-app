@@ -32,7 +32,7 @@ class RandomChar extends Component {
 
   onCharLoading = () => {
     this.setState({
-      isLoading : true
+      isLoading: true
     })
   }
 
