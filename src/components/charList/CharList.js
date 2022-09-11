@@ -12,50 +12,60 @@ class CharList extends Component {
     characters: [],
     isLoading: true,
     hasError: false,
+    isRequested: false,
+    offset: 0,
+    isCharListEnded: false
   }
 
   marvelService = new MarvelService();
 
   componentDidMount() {
-    this.updateCharactersList();
+    this.onRequest();
   }
 
-  updateCharactersList = () => {
+  onRequest = (offset) => {
     this.onCharListLoading();
-    this.marvelService
-      .getAllCharacters()
+    this.marvelService.getAllCharacters(offset)
       .then(this.onCharactersListLoaded)
       .catch(this.onCharactersListLoadingError)
   }
 
   onCharListLoading = () => {
     this.setState({
-      isLoading: true
+      isRequested: true,
     })
+  }
+
+  onCharactersListLoaded = (charactersList) => {
+
+    let ended = false;
+    if (charactersList.length < 9) {
+      ended = true;
+    }
+
+    this.setState(({characters, offset}) => ({
+      characters: [...characters, ...charactersList],
+      isLoading: false,
+      hasError: false,
+      isRequested: false,
+      offset: offset + 9,
+      isCharListEnded: ended,
+    }));
   }
 
   onCharactersListLoadingError = () => {
     this.setState(
       {
         hasError: true,
-        isLoading: false
-      }
-    )
-  }
-
-  onCharactersListLoaded = (characters) => {
-    this.setState(
-      {
-        characters,
         isLoading: false,
-        hasError: false
+        isRequested: false,
       }
     )
   }
 
   render() {
 
-    const {characters, isLoading, hasError} = this.state;
+    const {characters, isLoading, hasError, isRequested, offset, isCharListEnded} = this.state;
     const content = characters.map(character => {
 
       const noImageSrc = 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg';
@@ -79,13 +89,20 @@ class CharList extends Component {
         <ul className="char__grid">
           {charList}
         </ul>
-        <button className="button button__main button__long">
-          <div className="inner">load more</div>
-        </button>
+        {
+          !isCharListEnded
+          &&
+          <button className="button button__main button__long"
+                  onClick={() => this.onRequest(offset)}
+                  disabled={isRequested}>
+            <div className="inner">
+              {isRequested ? "loading..." : "load more"}
+            </div>
+          </button>
+        }
       </div>
     )
   }
-
 }
 
 const CharacterListItem = ({name, src, style, onClick}) => {
