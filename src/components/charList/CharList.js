@@ -1,4 +1,5 @@
 import {Component} from "react";
+import PropTypes from "prop-types";
 
 import './charList.scss';
 import MarvelService from "../../services/MarvelService";
@@ -63,20 +64,46 @@ class CharList extends Component {
     )
   }
 
+  itemRefs = [];
+  setRef = (ref) => {
+    this.itemRefs.push(ref);
+  }
+
+  itemFocus = (id) => {
+    this.itemRefs.forEach(item => item.classList.remove('char__item_selected'));
+    this.itemRefs[id].classList.add('char__item_selected');
+    this.itemRefs[id].focus();
+  }
+
   render() {
 
     const {characters, isLoading, hasError, isRequested, offset, isCharListEnded} = this.state;
-    const content = characters.map(character => {
-
+    const content = characters.map((character, idx) => {
+      const {id, name, thumbnail, } = character;
       const noImageSrc = 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg';
-      const imgStyle = character.thumbnail === noImageSrc ? {objectFit: 'contain'} : {objectFit: 'cover'};
-
-      return <CharacterListItem key={character.id}
-                                onClick={() => this.props.onCharSelected(character.id)}
-                                name={character.name}
-                                src={character.thumbnail}
-                                style={imgStyle}
-      />
+      const imgStyle = thumbnail === noImageSrc ? {objectFit: 'contain'} : {objectFit: 'cover'};
+      return (
+        <li key={id}
+            className="char__item"
+            ref={this.setRef}
+            tabIndex={0}
+            onClick={
+              () => {
+                this.props.onCharSelected(id);
+                this.itemFocus(idx);
+              }
+            }
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === "Enter") {
+                this.props.onCharSelected(id);
+                this.itemFocus(idx);
+              }
+            }}>
+        >
+          <img src={thumbnail} alt={name} style={imgStyle}/>
+          <div className="char__name">{name}</div>
+        </li>
+      )
     })
     const errorMessage = hasError ? <ErrorMessage/> : null;
     const spinner = isLoading ? <Spinner/> : null;
@@ -105,13 +132,8 @@ class CharList extends Component {
   }
 }
 
-const CharacterListItem = ({name, src, style, onClick}) => {
-  return (
-    <li className="char__item" onClick={onClick}>
-      <img src={src} alt={name} style={style}/>
-      <div className="char__name">{name}</div>
-    </li>
-  )
+CharList.propTypes = {
+  onCharSelected: PropTypes.func.isRequired,
 }
 
 export default CharList;
