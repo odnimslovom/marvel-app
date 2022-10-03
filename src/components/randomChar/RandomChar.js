@@ -3,44 +3,31 @@ import {useEffect, useState} from "react";
 import './randomChar.scss';
 
 import mjolnir from '../../resources/img/mjolnir.png';
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 
 const RandomChar = () => {
 
   const [character, setCharacter] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
-
-  const marvelService = new MarvelService();
+  const {isLoading, hasError, getCharacter, clearError} = useMarvelService();
 
   useEffect(() => {
     updateCharacter();
+    const timerId = setInterval(updateCharacter, 60000);
+    return () => {
+      clearInterval(timerId);
+    }
   }, [])
 
   const updateCharacter = () => {
-    onCharLoading();
     const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-    marvelService
-      .getCharacter(id)
-      .then(onCharacterLoaded)
-      .catch(onLoadingError);
-  }
-
-  const onCharLoading = () => {
-    setIsLoading(true);
+    getCharacter(id).then(onCharacterLoaded);
+    clearError();
   }
 
   const onCharacterLoaded = (character) => {
     setCharacter(character);
-    setIsLoading(false);
-    setHasError(false);
-  }
-
-  const onLoadingError = () => {
-    setIsLoading(false);
-    setHasError(true);
   }
 
   const errorMessage = hasError ? <ErrorMessage/> : null;

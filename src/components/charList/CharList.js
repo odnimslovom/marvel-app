@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from "react";
 import PropTypes from "prop-types";
 
 import './charList.scss';
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import Spinner from "../spinner/Spinner";
@@ -10,28 +10,22 @@ import Spinner from "../spinner/Spinner";
 const CharList = (props) => {
 
   const [characters, setCharacters] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
   const [isRequested, setIsRequested] = useState(false);
   const [offset, setOffset] = useState(0);
   const [isCharListEnded, setIsCharListEnded] = useState(false);
 
-  const marvelService = new MarvelService();
+  const {isLoading, hasError, getAllCharacters, clearError} = useMarvelService();
 
   useEffect(() => {
-    onRequest();
+    onRequest(offset, true);
   }, [])
 
-  const onRequest = (offset) => {
-    onCharListLoading();
-    marvelService.getAllCharacters(offset)
+  const onRequest = (offset, initial) => {
+    initial ? setIsRequested(false) : setIsRequested(true);
+    getAllCharacters(offset)
       .then(onCharactersListLoaded)
-      .catch(onCharactersListLoadingError)
   }
 
-  const onCharListLoading = () => {
-    setIsRequested(true);
-  }
 
   const onCharactersListLoaded = (charactersList) => {
     let ended = false;
@@ -39,18 +33,11 @@ const CharList = (props) => {
       ended = true;
     }
     setCharacters(characters => [...characters, ...charactersList]);
-    setIsLoading(false);
-    setHasError(false);
     setIsRequested(false);
     setOffset(offset => offset + 9);
     setIsCharListEnded(ended);
   }
 
-  const onCharactersListLoadingError = () => {
-    setHasError(true);
-    setIsLoading(false);
-    setIsRequested(false);
-  }
 
   const itemRefs = useRef([]);
 
@@ -93,8 +80,8 @@ const CharList = (props) => {
   }
 
   const errorMessage = hasError ? <ErrorMessage/> : null;
-  const spinner = isLoading ? <Spinner/> : null;
-  const charList = !(isLoading || hasError) ? renderCharacters(characters) : null;
+  const spinner = isLoading && !isRequested ? <Spinner/> : null;
+  const charList = renderCharacters(characters);
 
   return (
     <div className="char__list">

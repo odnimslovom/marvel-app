@@ -1,41 +1,38 @@
-class MarvelService {
+import {useHttp} from "../hooks/http.hook";
 
-    _apiBaseUrl = 'https://gateway.marvel.com:443/v1/public/';
-    _apiToken = 'apikey=ad6f4475dffe94fda4246a92a833cb94';
+const useMarvelService = () => {
 
-    _offset = 0;
+  const {isLoading, hasError, clearError, request} = useHttp();
 
-    _transformCharacterData = (character) => {
-      const defaultDescription = "Nothing description for this character.";
-      return ({
-        id : character.id,
-        name: character.name,
-        description: character.description ? character.description : defaultDescription,
-        thumbnail:
-          character.thumbnail.path + '.' + character.thumbnail.extension,
-        homepage: character.urls[0].url,
-        wiki: character.urls[1].url,
-        comics : character.comics.items
-      });
-    }
+  const _apiBaseUrl = 'https://gateway.marvel.com:443/v1/public/';
+  const _apiToken = 'apikey=ad6f4475dffe94fda4246a92a833cb94';
+  const _offset = 0;
 
-     getResource = async (url) =>{
-        let res = await fetch(url);
-        if (!res.ok) {
-            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-        }
-        return await res.json();
-    }
+  const getAllCharacters = async (offset = _offset) => {
+    const res = await request(`${_apiBaseUrl}characters?offset=${offset}&limit=9&${_apiToken}`);
+    return res.data.results.map(_transformCharacterData)
+  }
 
-    getAllCharacters = async (offset = this._offset) =>{
-         const res = await this.getResource(`${this._apiBaseUrl}characters?offset=${offset}&limit=9&${this._apiToken}`);
-         return res.data.results.map(this._transformCharacterData)
-    }
+  const getCharacter = async (id) => {
+    const res = await request(`${_apiBaseUrl}characters/${id}?${_apiToken}`);
+    return _transformCharacterData(res.data.results[0]);
+  }
 
-    getCharacter = async(id) =>{
-        const res = await this.getResource(`${this._apiBaseUrl}characters/${id}?${this._apiToken}`);
-        return this._transformCharacterData(res.data.results[0]);
-    }
+  const _transformCharacterData = (character) => {
+    const defaultDescription = "Nothing description for this character.";
+    return ({
+      id: character.id,
+      name: character.name,
+      description: character.description ? character.description : defaultDescription,
+      thumbnail:
+        character.thumbnail.path + '.' + character.thumbnail.extension,
+      homepage: character.urls[0].url,
+      wiki: character.urls[1].url,
+      comics: character.comics.items
+    });
+  }
+
+  return {isLoading, hasError, getCharacter, getAllCharacters, clearError};
 }
 
-export default MarvelService;
+export default useMarvelService;
