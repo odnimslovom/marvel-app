@@ -26,7 +26,6 @@ const CharList = (props) => {
       .then(onCharactersListLoaded)
   }
 
-
   const onCharactersListLoaded = (charactersList) => {
     let ended = false;
     if (charactersList.length < 9) {
@@ -38,9 +37,7 @@ const CharList = (props) => {
     setIsCharListEnded(ended);
   }
 
-
   const itemRefs = useRef([]);
-
   const itemFocus = (id) => {
     itemRefs.current.forEach(item => item.classList.remove('char__item_selected'));
     itemRefs.current[id].classList.add('char__item_selected');
