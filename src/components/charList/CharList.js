@@ -14,7 +14,7 @@ const CharList = (props) => {
   const [offset, setOffset] = useState(0);
   const [isCharListEnded, setIsCharListEnded] = useState(false);
 
-  const {isLoading, hasError, getAllCharacters, clearError} = useMarvelService();
+  const {isLoading, hasError, getAllCharacters} = useMarvelService();
 
   useEffect(() => {
     onRequest(offset, true);
