@@ -29,6 +29,7 @@ const useMarvelService = () => {
   }
 
   const _transformComicsData = (comics) => {
+    console.log(comics.prices[0].price);
     return {
       id: comics.id,
       title: comics.title,
@@ -36,7 +37,7 @@ const useMarvelService = () => {
       pageCount: comics.pageCount ? `${comics.pageCount} pages` : "No info about pages",
       thumbnail: comics.thumbnail.path + "." + comics.thumbnail.extension,
       language: comics.textObjects.language || "en-us",
-      price: comics.prices.price ? `${comics.prices.price}$` : 'not available'
+      price: comics.prices[0] ? `${comics.prices[0].price}$` : 'not available'
     }
   }
 

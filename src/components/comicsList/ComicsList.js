@@ -1,13 +1,17 @@
 import './comicsList.scss';
 
-import useMarvelService from "../../services/MarvelService";
 import {useEffect, useState} from "react";
+import {Link, matchPath} from "react-router-dom"
+
+import useMarvelService from "../../services/MarvelService";
+
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import Spinner from "../spinner/Spinner";
 
+
 const ComicsList = () => {
 
-  const {getAllComics, getComics, isLoading, hasError} = useMarvelService();
+  const {getAllComics, isLoading, hasError} = useMarvelService();
   const [comics, setComics] = useState([]);
   const [isRequested, setIsRequested] = useState(false);
   const [offset, setOffset] = useState(0);
@@ -35,14 +39,14 @@ const ComicsList = () => {
   }
 
   function renderItems(arr) {
-    const items = arr.map((item, i) => {
+    const items = arr.map((item, idx) => {
       return (
-        <li className="comics__item" key={i}>
-          <a href="#">
+        <li className="comics__item" key={idx}>
+          <Link to={`/comics/${item.id}`}>
             <img src={item.thumbnail} alt={item.title} className="comics__item-img"/>
             <div className="comics__item-name">{item.title}</div>
             <div className="comics__item-price">{item.price}</div>
-          </a>
+          </Link>
         </li>
       )
     });
