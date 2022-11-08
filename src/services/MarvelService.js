@@ -29,7 +29,6 @@ const useMarvelService = () => {
   }
 
   const _transformComicsData = (comics) => {
-    console.log(comics.prices[0].price);
     return {
       id: comics.id,
       title: comics.title,

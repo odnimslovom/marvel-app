@@ -6,6 +6,7 @@ import useMarvelService from "../../services/MarvelService";
 
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import Spinner from "../spinner/Spinner";
+import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 const CharList = (props) => {
 
@@ -50,28 +51,29 @@ const CharList = (props) => {
       const noImageSrc = 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg';
       const imgStyle = thumbnail === noImageSrc ? {objectFit: 'contain'} : {objectFit: 'cover'};
       return (
-        <li key={id}
-            className="char__item"
-            ref={(elem) => {
-              itemRefs.current[idx] = elem
-            }}
-            tabIndex={0}
-            onClick={
-              () => {
-                props.onCharSelected(id);
-                itemFocus(idx);
+        <CSSTransition key={id} timeout={500} classNames={"char__item"}>
+          <li className="char__item"
+              ref={(elem) => {
+                itemRefs.current[idx] = elem
+              }}
+              tabIndex={0}
+              onClick={
+                () => {
+                  props.onCharSelected(id);
+                  itemFocus(idx);
+                }
               }
-            }
-            onKeyDown={(e) => {
-              if (e.key === ' ' || e.key === "Enter") {
-                props.onCharSelected(id);
-                itemFocus(idx);
-              }
-            }}>
-          >
-          <img src={thumbnail} alt={name} style={imgStyle}/>
-          <div className="char__name">{name}</div>
-        </li>
+              onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === "Enter") {
+                  props.onCharSelected(id);
+                  itemFocus(idx);
+                }
+              }}>
+            >
+            <img src={thumbnail} alt={name} style={imgStyle}/>
+            <div className="char__name">{name}</div>
+          </li>
+        </CSSTransition>
       )
     });
   }
@@ -85,7 +87,9 @@ const CharList = (props) => {
       {spinner}
       {errorMessage}
       <ul className="char__grid">
-        {charList}
+        <TransitionGroup component={null}>
+          {charList}
+        </TransitionGroup>
       </ul>
       {
         !isCharListEnded
